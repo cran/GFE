@@ -4,8 +4,13 @@
 \alias{estGF}
 \title{Gross Flows estimation}
 \usage{
-estGF(sampleBase = NULL, niter = 100, model = NULL, colWeights = NULL,
-  nonrft = FALSE)
+estGF(
+  sampleBase = NULL,
+  niter = 100,
+  model = NULL,
+  colWeights = NULL,
+  nonrft = FALSE
+)
 }
 \arguments{
 \item{sampleBase}{An object of class "data.frame" containing the information of electoral candidates. The data must contain the samplings weights.}
@@ -103,6 +108,6 @@ estima
 }
 \references{
 Stasny, E. (1987), `Some markov-chain models for nonresponse in estimating gross', \emph{Journal of Oficial Statistics} \bold{3}, pp. 359-373. \cr
-Sarndal, C.-E., Swensson, B. \& Wretman, J. (1992), \emph{Model Assisted Survey Sampling}, Springer-Verlag, New York, USA. \cr
-Gutierrez, A., Trujillo, L. \& Silva, N. (2014), `The estimation of gross ows in complex surveys with random nonresponse', \emph{Survey Methodology} \bold{40}(2), pp. 285-321.
+Sarndal, C.-E., Swensson, B. & Wretman, J. (1992), \emph{Model Assisted Survey Sampling}, Springer-Verlag, New York, USA. \cr
+Gutierrez, A., Trujillo, L. & Silva, N. (2014), `The estimation of gross ows in complex surveys with random nonresponse', \emph{Survey Methodology} \bold{40}(2), pp. 285-321.
 }

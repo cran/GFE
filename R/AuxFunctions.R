@@ -81,7 +81,7 @@ return(base)
 #' sum(round_preserve_sum(c(0.333, 0.333, 0.334), 2))
 #' @importFrom utils tail
 #' @source
-#' \url{https://www.r-bloggers.com/round-values-while-preserve-their-rounded-sum-in-r/} and \url{http://stackoverflow.com/questions/32544646/round-vector-of-numerics-to-integer-while-preserving-their-sum}
+#' \url{https://www.r-bloggers.com/2016/07/round-values-while-preserve-their-rounded-sum-in-r/} and \url{https://stackoverflow.com/questions/32544646/round-vector-of-numerics-to-integer-while-preserving-their-sum}
 #' @export round_preserve_sum
 round_preserve_sum <- function(x, digits = 0) {
   up <- 10 ^ digits

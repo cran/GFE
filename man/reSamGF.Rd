@@ -4,8 +4,15 @@
 \alias{reSamGF}
 \title{Gross flows variance estimation.}
 \usage{
-reSamGF(sampleBase = NULL, nRepBoot = 500, model = "I", niter = 100,
-  type = "Bootstrap", colWeights = NULL, nonrft = FALSE)
+reSamGF(
+  sampleBase = NULL,
+  nRepBoot = 500,
+  model = "I",
+  niter = 100,
+  type = "Bootstrap",
+  colWeights = NULL,
+  nonrft = FALSE
+)
 }
 \arguments{
 \item{sampleBase}{An object of class data.frame or data.table containing the sample selected to estimate the gross flows.}

@@ -4,7 +4,7 @@
 \alias{round_preserve_sum}
 \title{Round preserve sum.}
 \source{
-\url{https://www.r-bloggers.com/round-values-while-preserve-their-rounded-sum-in-r/} and \url{http://stackoverflow.com/questions/32544646/round-vector-of-numerics-to-integer-while-preserving-their-sum}
+\url{https://www.r-bloggers.com/2016/07/round-values-while-preserve-their-rounded-sum-in-r/} and \url{https://stackoverflow.com/questions/32544646/round-vector-of-numerics-to-integer-while-preserving-their-sum}
 }
 \usage{
 round_preserve_sum(x, digits = 0)

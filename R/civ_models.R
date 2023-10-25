@@ -4,7 +4,7 @@
 #' @param niter The number of iterations for the \eqn{\eta_{i}} and \eqn{p_{ij}} model parameters within the model.
 #' @param colWeights The column name containing the sampling weights to be used in the fitting process.
 #' @param model A character indicating the model to be used in estimating estimated gross flows. The models available are: "I","II","III","IV" (see also "Details").
-#' @param nonrft A logical value indicating a non response for first time. 
+#' @param nonrft A logical value indicating a non response for first time.
 #' @return \code{estGF} returns a list containing:
 #' 			\enumerate{
 #' 			 \item \bold{Est.CIV:} a data.frame containing the gross flows estimation.
@@ -29,7 +29,7 @@
 #' # Colombia's electoral candidates in 2014
 #' candidates_t0 <- c("Clara","Enrique","Santos","Martha","Zuluaga","WhiteVote", "NoVote")
 #' candidates_t1 <- c("Santos","Zuluaga","WhiteVote", "NoVote")
-#' 
+#'
 #' N <- 100000
 #' nCanT0 <- length(candidates_t0)
 #' nCanT1 <- length(candidates_t1)
@@ -48,16 +48,16 @@
 #' citaMod <- matrix(, ncol = nCanT1, nrow = nCanT0)
 #' row.names(citaMod) <- candidates_t0
 #' colnames(citaMod) <- candidates_t1
-#' 
+#'
 #' for(ii in 1:nCanT0){
 #' 		citaMod[ii,] <- c(rmultinom(1, size = N * eta[ii,], prob = P[ii,]))
 #' }
-#' 
+#'
 #' # # Model I
 #' psiI   <- 0.9
 #' rhoRRI <- 0.9
 #' rhoMMI <- 0.5
-#' 
+#'
 #' citaModI <- matrix(nrow = nCanT0 + 1, ncol = nCanT1 + 1)
 #' rownames(citaModI) <- c(candidates_t0, "Non_Resp")
 #' colnames(citaModI) <- c(candidates_t1, "Non_Resp")
@@ -67,27 +67,27 @@
 #' citaModI[(nCanT0 + 1), 1:nCanT1 ] <- (1-rhoMMI) * (1-psiI) * colSums(P * c(eta))
 #' citaModI <- round_preserve_sum(citaModI * N)
 #' DBcitaModI <- createBase(citaModI)
-#' 
+#'
 #' # Creating auxiliary information
 #' DBcitaModI[,AuxVar := rnorm(nrow(DBcitaModI), mean = 45, sd = 10)]
-#' 
+#'
 #' # Selects a sample with unequal probabilities
 #' res <- S.piPS(n = 3200, as.data.frame(DBcitaModI)[,"AuxVar"])
 #' sam <- res[,1]
 #' pik <- res[,2]
 #' DBcitaModISam <- copy(DBcitaModI[sam,])
 #' DBcitaModISam[,Pik := pik]
-#' 
+#'
 #' # Gross Flows estimation
 #' estima <- estGF(sampleBase = DBcitaModISam, niter = 500, model = "I", colWeights = "Pik")
 #' estima
-#' @references 
+#' @references
 #' Stasny, E. (1987), `Some markov-chain models for nonresponse in estimating gross', \emph{Journal of Oficial Statistics} \bold{3}, pp. 359-373. \cr
-#' Sarndal, C.-E., Swensson, B. \& Wretman, J. (1992), \emph{Model Assisted Survey Sampling}, Springer-Verlag, New York, USA. \cr
-#' Gutierrez, A., Trujillo, L. \& Silva, N. (2014), `The estimation of gross ows in complex surveys with random nonresponse', \emph{Survey Methodology} \bold{40}(2), pp. 285-321.
+#' Sarndal, C.-E., Swensson, B. & Wretman, J. (1992), \emph{Model Assisted Survey Sampling}, Springer-Verlag, New York, USA. \cr
+#' Gutierrez, A., Trujillo, L. & Silva, N. (2014), `The estimation of gross ows in complex surveys with random nonresponse', \emph{Survey Methodology} \bold{40}(2), pp. 285-321.
 #' @export estGF
 estGF  <- function(sampleBase = NULL, niter = 100, model = NULL, colWeights = NULL, nonrft = FALSE){
-	
+
 	if(is.null(sampleBase)) stop("Data base must be specified")
 	if(niter == 100) warning("By defect ", niter, " iterations will be run for: Eta and Pij", call. = FALSE)
 	if(!model %in% c('I', 'II', 'III', 'IV')) stop("The model is not supported by method")
@@ -111,38 +111,38 @@ estGF  <- function(sampleBase = NULL, niter = 100, model = NULL, colWeights = NU
 	y1 <- as.matrix(sampleBase[,candidates_t0])
 	y2 <- as.matrix(sampleBase[,candidates_t1])
 	Wk <- 1/sampleBase[,colWeights]
-		
-	Est.Nij <- t(Wk*y1)%*%y2 
-	Est.Ri  <- t(Wk*y1)%*%(1-z2) 
-	Est.Cj  <- t(Wk*y2)%*%(1-z1) 
+
+	Est.Nij <- t(Wk*y1)%*%y2
+	Est.Ri  <- t(Wk*y1)%*%(1-z2)
+	Est.Cj  <- t(Wk*y2)%*%(1-z1)
 	Est.M   <- c(t(Wk*(1-z1))%*%(1-z2) )
-	Est.N   <- sum(Est.Nij)+sum(Est.Ri)+sum(Est.Cj)+Est.M 
+	Est.N   <- sum(Est.Nij)+sum(Est.Ri)+sum(Est.Cj)+Est.M
 
 	if(model == "I" ){
-	
+
 		Est.rhoRR <- sum(Est.Nij)/(sum(Est.Nij)+sum(Est.Ri))
 		Est.pij   <- as.matrix(prop.table(Est.Nij, 1))
 		Est.rhoMM <- NA
-		Est.psi   <- 1		
+		Est.psi   <- 1
 		Est.eta   <- (rowSums(Est.Nij) + Est.Ri) / Est.N
-		
+
 		if(!nonrft){
 			Est.psi   <- (sum(Est.Nij)+sum(Est.Ri))/(sum(Est.Nij)+sum(Est.Ri)+sum(Est.Cj)+Est.M)
 			Est.rhoMM <- Est.M/(sum(Est.Cj)+Est.M)
 			Est.eta <- rowSums(Est.Nij) / sum(Est.Nij)
-		
+
 			for(kk in 1:niter){
-		
+
 				M.eta     <- NULL
 				for(ii in 1:NCandidatosT0){
 					etai <- sum(t(Est.Cj) * Est.pij[ii,] / (Est.eta %*% Est.pij))
-					M.eta <- c(M.eta, etai)				
+					M.eta <- c(M.eta, etai)
 				}
-				
-				Est.eta.aux <- (rowSums(Est.Nij) + Est.Ri + 
-								matrix(M.eta * Est.eta)) / (sum(Est.Nij) + 
+
+				Est.eta.aux <- (rowSums(Est.Nij) + Est.Ri +
+								matrix(M.eta * Est.eta)) / (sum(Est.Nij) +
 								sum(Est.Ri)+sum(Est.Cj) )
-		
+
 				parte1  <- t(kronecker(t(matrix(Est.eta)), matrix(t(Est.Cj)/(Est.eta%*%Est.pij))))
 				parte2  <- matrix(rep(rowSums(Est.Nij),NCandidatosT1), nrow = NCandidatosT0)
 				parte3  <- matrix(rep(M.eta*Est.eta,NCandidatosT1), nrow = NCandidatosT0)
@@ -152,7 +152,7 @@ estGF  <- function(sampleBase = NULL, niter = 100, model = NULL, colWeights = NU
 			}
 			Est.eta <- t(Est.eta)
 		}
-			
+
 		Est.GF <- as.vector(sum(Est.Nij))*as.matrix(Est.pij)*as.vector(Est.eta)
 
 		}else if(model == "II"){
@@ -160,14 +160,14 @@ estGF  <- function(sampleBase = NULL, niter = 100, model = NULL, colWeights = NU
 			Est.rhoRR <- sum(Est.Nij)/(sum(Est.Nij)+sum(Est.Ri))
 			Est.pij   <- as.matrix(prop.table(Est.Nij, 1))
 			Est.rhoMM <- NA
-			Est.psi   <- 1	
+			Est.psi   <- 1
 			Est.eta   <- (rowSums(Est.Nij) + Est.Ri) / Est.N
-			
+
 			if(!nonrft){
 				Est.rhoMM <- Est.M/(sum(Est.Cj)+Est.M)
 				Est.psi   <- rep(1/NCandidatosT0, NCandidatosT0)
 				Est.eta   <- rowSums(Est.Nij) / sum(Est.Nij)
-						
+
 				for(kk in 1:niter){
 
 					suma.psi <- NULL
@@ -175,11 +175,11 @@ estGF  <- function(sampleBase = NULL, niter = 100, model = NULL, colWeights = NU
 					for(jj in 1:NCandidatosT1){
 						suma.psiAux <- Est.Cj[jj]*(1-Est.psi)*Est.eta*Est.pij[,jj]/sum((1-Est.psi)*Est.eta*Est.pij[,jj])
 						suma.psi 	<- cbind(suma.psi, suma.psiAux)
-						
+
 					}
 
 					suma.psi <- rowSums(suma.psi)
-					Est.psi  <- as.vector((rowSums(Est.Nij) + Est.Ri) / (rowSums(Est.Nij) + 
+					Est.psi  <- as.vector((rowSums(Est.Nij) + Est.Ri) / (rowSums(Est.Nij) +
 											Est.Ri + suma.psi + Est.M*((1-Est.psi)*Est.eta /
 											 sum((1-Est.psi)*Est.eta))))
 
@@ -189,7 +189,7 @@ estGF  <- function(sampleBase = NULL, niter = 100, model = NULL, colWeights = NU
 					}
 
 					suma.eta <- rowSums(suma.eta)
-					Est.eta <- as.vector((rowSums(Est.Nij) + c(Est.Ri) + suma.eta + 
+					Est.eta <- as.vector((rowSums(Est.Nij) + c(Est.Ri) + suma.eta +
 										    Est.M*((1-Est.psi)*Est.eta / sum((1-Est.psi)*Est.eta))) /
 											  (sum(Est.Nij)+sum(Est.Ri)+sum(Est.Cj)+Est.M))
 
@@ -214,20 +214,20 @@ estGF  <- function(sampleBase = NULL, niter = 100, model = NULL, colWeights = NU
 				names(Est.psi) <- candidates_t0
 				Est.psi <- t(t(Est.psi))
 			}
-			
+
 		}else if(model == "III"){
 
 				Est.rhoRR <- rowSums(Est.Nij)/(rowSums(Est.Nij)+Est.Ri)
 				Est.pij   <- as.matrix(prop.table(Est.Nij, 1))
 				Est.eta   <- (rowSums(Est.Nij) + Est.Ri) / Est.N
 				Est.rhoMM <- NA
-				Est.psi   <- 1 
-				
+				Est.psi   <- 1
+
 				if(!nonrft){
 					Est.rhoMM <- rep(1/NCandidatosT0, NCandidatosT0)
 					Est.psi   <- (sum(Est.Nij)+sum(Est.Ri))/(sum(Est.Nij)+sum(Est.Ri)+sum(Est.Cj)+Est.M)
 					Est.eta   <- rowSums(Est.Nij) / sum(Est.Nij)
-								
+
 					for(kk in 1:niter){
 
 						suma.rhoMM <- NULL
@@ -265,7 +265,7 @@ estGF  <- function(sampleBase = NULL, niter = 100, model = NULL, colWeights = NU
 				}
 				Est.rhoMM <- t(t(Est.rhoMM))
 				Est.eta <- t(t(Est.eta))
-				Est.GF <- as.vector(sum(Est.Nij))*as.matrix(Est.pij)*as.vector(Est.eta)		
+				Est.GF <- as.vector(sum(Est.Nij))*as.matrix(Est.pij)*as.vector(Est.eta)
 
 		}else if(model == "IV"){
 
@@ -282,7 +282,7 @@ estGF  <- function(sampleBase = NULL, niter = 100, model = NULL, colWeights = NU
 				Est.rhoRR <- rep(1/NCandidatosT0, NCandidatosT1)
 				Est.pij   <- as.matrix(prop.table(Est.Nij, 1))
 
-				for(kk in 1:niter){			
+				for(kk in 1:niter){
 
 					suma.rhoRR <- NULL
 					for(ii in 1:NCandidatosT0){
@@ -318,7 +318,7 @@ estGF  <- function(sampleBase = NULL, niter = 100, model = NULL, colWeights = NU
 					matriz2.R.pij  <- kronecker(t(matrix(rep(1,NCandidatosT1))), matrix(M.R.pij) )
 					P1 <- matriz1.R.pij/matriz2.R.pij
 
-					if(!nonrft){		
+					if(!nonrft){
 						matriz1.C.pij  <- kronecker(t(matrix(Est.Cj)), Est.eta)*Est.pij
 						M.C.pij <- NULL
 						for(jj in 1:NCandidatosT1){
@@ -342,8 +342,8 @@ estGF  <- function(sampleBase = NULL, niter = 100, model = NULL, colWeights = NU
 				if(!nonrft){
 					names(Est.rhoMM) <- candidates_t1
 					Est.rhoMM <- t(Est.rhoMM)
-				}	
-		} 
+				}
+		}
 
 		if(!nonrft){
 			return(list(Est.GF = Est.GF,
